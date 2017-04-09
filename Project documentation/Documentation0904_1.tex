@@ -1,0 +1,104 @@
+\documentclass[12pt, twoside, a4paper ,openright]{book}
+\usepackage{calc}
+\usepackage{amsfonts}
+\usepackage{latexsym}
+\usepackage{placeins}
+\ifx\pdftexversion\undefined
+  \usepackage[dvips]{graphicx}
+\else
+  \usepackage[pdftex]{graphicx}
+\fi
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{authblk}
+\usepackage{amsmath}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[bulgarian]{babel}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{pdfpages}
+\usepackage{dsfont}
+\usepackage{enumerate}
+\addtolength{\topmargin}{-1cm}
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\addtolength{\headheight}{0.5pt}
+\fancypagestyle{plain}{
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
+}
+\newtheorem{liuvil}{Теорема}
+\newtheorem*{lax}{Твърдение}
+\newtheorem*{laxhamilton}{Твърдение}
+\newtheorem*{todalax}{Твърдение}
+\newtheorem*{rtoda}{Твърдение}
+\newtheorem*{jacobi}{Твърдение}
+\newtheorem*{toda}{Твърдение}
+\newtheorem*{todasolution}{Твърдение}
+\newtheorem*{tvardenie1}{Твърдение}
+\newtheorem*{tvardenie2}{Твърдение}
+\newtheorem*{lema}{Лема}
+\newtheorem*{lemaa}{Лема}
+\theoremstyle{definition}
+\newtheorem*{grupa}{Дефиниция}
+\newtheorem*{algebra}{Дефиниция}
+
+
+
+\begin{document}
+
+\title{\LARGE Проект по Приложна Статистика \\ [1em] \huge \textbf{Анализ на музикални данни от "Million Songs"}}
+\author{Никола Юруков \hspace{1cm} Елица Илиева}
+\date{\\[1em] {9 април 2017 г.} \\ [0.8cm] Преподавател: г. ас. д-р Нина Даскалова\\ [0.5cm] Софийски Университет "Св. Климент Охридски"  \\ Факултет по Математика и Информатика
+	
+\clearpage
+\maketitle
+\tableofcontents
+\thispagestyle{empty}
+\renewcommand\abstractname{Abstract}
+\renewcommand\tablename{Table}
+\newpage
+\addcontentsline 
+
+\chapter{Въведение}
+	Работим върху датасет, който съдържа информация за повече от милион песни, кога са издадени, кой е техният автор, каква тоналност имат, дали може да се танцува на тях, и какъв е техния "hotness". На базата на статистичеки проучвания целим да намерим корелацията между това колко харесвана е дадена песен спрямо нейната ритмичност и редица други подобни показатели. 
+	
+\section{Защо избрахме този дейтасет?}
+
+
+
+\section{Какви данни съдържа той?}
+
+\chapter{Заключение}
+
+\begin{thebibliography}{99}
+\small
+\bibitem[1]{arnold} V. Arnold, Mathematical Methods of Classical Mechanics 2nd ed. (1988)
+\bibitem[2]{babelon} O. Babelon, D. Bernard, M. Talon,  Introduction to Classical Integrable Systems (2003)
+\bibitem[3]{nakahara} M. Nakahara, Geomerty, Topology and Physics (1989)
+\bibitem[4]{das} A. Das, Integrable Models (1989)
+\bibitem[5]{gilmore} R. Gilmore, Lie groups, Physics, and Geometry: An Introduction for Physicists, Engineers and Chemists (2008)
+\bibitem[6]{szekeres} P. Szekeres, A Course in Modern Mathematical Physics -- Groups, Hilbert Spaces and Diff. Geometry (2004)
+\bibitem[7]{isham} C. Isham, Modern Differential Geometry for Physicists (1999)
+\bibitem[8]{toda} M. Toda, Theory of nonlinear lattices (1981)
+\bibitem[9]{knapp} A. W. Knapp, Structure Theory of Semisimple Lie Groups (1997)
+\bibitem[10]{perelomov1} M. A. Olshanetsky, A. M. Perelomov, Classical Integrable Finite-Dimensional Systems Related to Lie Algebras (1980)
+\bibitem[11]{perelomov2} M. A. Olshanetsky, A. M. Perelomov, Explicit Solutions of Classical Toda Models (1979)
+\bibitem[12]{kodama} Y. Kodama, J. Ye, The Generalized Toda Lattice Equation on Semisimple Lie Algebras (1995)
+\bibitem[13]{krichever} I. Krichever, K. Vaninsky, The Periodic and Open Toda Lattice (2000)
+\end{thebibliography}
+\end{document} 
