@@ -208,6 +208,199 @@ Let's save our dataframe object.
 
 Great! Now we are ready to continue with our data exploration.
 
+## Hotness Linear model
+
+We want to predict the hotness of a song based on its other characteristics. Let's try doing that. First let's load the dataset
+
+	> D <- readRDS("dataset-large.rds")
+
+Now looking at the structure of the dataset (`str(D)`), we will want to identify the candidate variables to use in a regression. If we just use
+
+	linear_model1 = lm(Hotness ~ . , data=D)
+
+This crashed my computer because of using too much RAM. Why? Because the YearBucket and ArtistLocation and KeySignature and TimeSignature *factor* variables create an explosion of "regression input vars", because each factor value is converted into a boolean regression input variable which causes too much memory to be used. Thus we should limit ourselves to a few, well-chosen variables here. Let us try:
+
+	> lm1 <- lm(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature, data=D)
+	> summary(lm1)
+
+
+	Call:
+	lm(formula = Hotness ~ Duration + ArtistLatitude + ArtistLongitude + 
+	    KeySignature + Loudness + Tempo + TimeSignature, data = D)
+
+	Residuals:
+	     Min       1Q   Median       3Q      Max 
+	-0.46710 -0.14701  0.02158  0.17243  0.74014 
+
+	Coefficients:
+			  Estimate Std. Error t value Pr(>|t|)    
+	(Intercept)      3.309e-01  3.206e-02  10.320  < 2e-16 ***
+	Duration        -1.428e-05  5.706e-06  -2.502 0.012354 *  
+	ArtistLatitude   1.036e-03  4.254e-05  24.344  < 2e-16 ***
+	ArtistLongitude  2.210e-04  1.191e-05  18.554  < 2e-16 ***
+	KeySignature1    1.311e-02  3.022e-03   4.339 1.43e-05 ***
+	KeySignature2    5.492e-03  2.695e-03   2.037 0.041603 *  
+	KeySignature3    4.586e-03  4.215e-03   1.088 0.276546    
+	KeySignature4    1.275e-02  2.943e-03   4.332 1.48e-05 ***
+	KeySignature5   -1.768e-03  3.034e-03  -0.583 0.559995    
+	KeySignature6    1.569e-02  3.340e-03   4.698 2.63e-06 ***
+	KeySignature7   -2.394e-03  2.628e-03  -0.911 0.362234    
+	KeySignature8    1.028e-02  3.469e-03   2.963 0.003048 ** 
+	KeySignature9    2.689e-03  2.715e-03   0.990 0.321988    
+	KeySignature10  -4.437e-03  3.211e-03  -1.382 0.167097    
+	KeySignature11   1.103e-02  3.024e-03   3.647 0.000266 ***
+	Loudness         7.766e-03  1.339e-04  58.012  < 2e-16 ***
+	Tempo            1.418e-04  1.936e-05   7.321 2.47e-13 ***
+	TimeSignature1   5.071e-02  3.191e-02   1.589 0.111982    
+	TimeSignature3   5.736e-02  3.189e-02   1.799 0.072070 .  
+	TimeSignature4   5.613e-02  3.185e-02   1.762 0.078040 .  
+	TimeSignature5   5.763e-02  3.195e-02   1.804 0.071270 .  
+	TimeSignature7   6.682e-02  3.212e-02   2.080 0.037484 *  
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	Residual standard error: 0.23 on 120934 degrees of freedom
+	  (449108 observations deleted due to missingness)
+	Multiple R-squared:  0.04101,	Adjusted R-squared:  0.04084 
+	F-statistic: 246.3 on 21 and 120934 DF,  p-value: < 2.2e-16
+
+The R-squared value is very low, which means that the predictive power of the model is not very good. Also we have made a mistake - the ArtistLatitude and ArtistLongtitude variables show as significant however they should not be used in a regression model, since they mean that an artist with larger longitude is "better" or "worse" than one with a smaller one. Such a view is wrong. Latitude and Longitude can be used in decision trees to decide "regions" of popularity. Let's remove them and make a new model.
+
+	> lm2 <- lm(Hotness ~ Duration + KeySignature + Loudness + Tempo + TimeSignature, data=D)
+	> summary(lm2)
+
+	Call:
+	lm(formula = Hotness ~ Duration + KeySignature + Loudness + Tempo + 
+	    TimeSignature, data = D)
+
+	Residuals:
+	     Min       1Q   Median       3Q      Max 
+	-0.45919 -0.14562  0.02339  0.17274  0.71653 
+
+	Coefficients:
+			 Estimate Std. Error t value Pr(>|t|)    
+	(Intercept)     4.136e-01  1.884e-02  21.952  < 2e-16 ***
+	Duration       -1.679e-05  3.446e-06  -4.873 1.10e-06 ***
+	KeySignature1   7.043e-03  1.813e-03   3.884 0.000103 ***
+	KeySignature2   2.964e-03  1.659e-03   1.787 0.074018 .  
+	KeySignature3   8.871e-03  2.631e-03   3.372 0.000748 ***
+	KeySignature4   9.039e-03  1.805e-03   5.009 5.48e-07 ***
+	KeySignature5  -5.275e-04  1.894e-03  -0.278 0.780636    
+	KeySignature6   1.041e-02  2.013e-03   5.169 2.36e-07 ***
+	KeySignature7  -4.136e-03  1.617e-03  -2.558 0.010542 *  
+	KeySignature8   1.193e-02  2.127e-03   5.611 2.02e-08 ***
+	KeySignature9   6.950e-04  1.667e-03   0.417 0.676826    
+	KeySignature10 -5.520e-03  1.958e-03  -2.819 0.004812 ** 
+	KeySignature11  2.813e-03  1.817e-03   1.548 0.121573    
+	Loudness        7.384e-03  8.391e-05  88.003  < 2e-16 ***
+	Tempo           6.887e-05  1.173e-05   5.873 4.29e-09 ***
+	TimeSignature1 -2.732e-03  1.880e-02  -0.145 0.884415    
+	TimeSignature3  8.096e-03  1.879e-02   0.431 0.666485    
+	TimeSignature4  9.250e-03  1.876e-02   0.493 0.622024    
+	TimeSignature5  5.217e-03  1.882e-02   0.277 0.781617    
+	TimeSignature7  1.327e-02  1.893e-02   0.701 0.483163    
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	Residual standard error: 0.2314 on 330987 degrees of freedom
+	  (239057 observations deleted due to missingness)
+	Multiple R-squared:  0.02698,	Adjusted R-squared:  0.02692 
+	F-statistic:   483 on 19 and 330987 DF,  p-value: < 2.2e-16
+
+Our redsidual standard error has not changed between the models. That means that the data fit is approximately the same. The R-squared is quite low, which means the model is quite weak. We do also observer that the TimeSignature variable is not significant in any of its values. We can remove it. Again
+
+        > lm3 <- lm(Hotness ~ Duration + KeySignature + Loudness + Tempo, data=D)
+	> summary(lm3)
+
+	Call:
+	lm(formula = Hotness ~ Duration + KeySignature + Loudness + Tempo, 
+	    data = D)
+
+	Residuals:
+	     Min       1Q   Median       3Q      Max 
+	-0.46007 -0.14564  0.02336  0.17271  0.71787 
+
+	Coefficients:
+			 Estimate Std. Error t value Pr(>|t|)    
+	(Intercept)     4.206e-01  2.284e-03 184.145  < 2e-16 ***
+	Duration       -1.323e-05  3.413e-06  -3.877 0.000106 ***
+	KeySignature1   7.183e-03  1.813e-03   3.962 7.45e-05 ***
+	KeySignature2   2.892e-03  1.659e-03   1.743 0.081421 .  
+	KeySignature3   8.987e-03  2.631e-03   3.415 0.000637 ***
+	KeySignature4   9.069e-03  1.805e-03   5.025 5.05e-07 ***
+	KeySignature5  -5.441e-04  1.894e-03  -0.287 0.773919    
+	KeySignature6   1.060e-02  2.013e-03   5.265 1.40e-07 ***
+	KeySignature7  -4.106e-03  1.617e-03  -2.539 0.011129 *  
+	KeySignature8   1.203e-02  2.127e-03   5.654 1.57e-08 ***
+	KeySignature9   5.829e-04  1.668e-03   0.350 0.726694    
+	KeySignature10 -5.325e-03  1.958e-03  -2.720 0.006531 ** 
+	KeySignature11  2.904e-03  1.817e-03   1.598 0.109987    
+	Loudness        7.487e-03  8.231e-05  90.969  < 2e-16 ***
+	Tempo           7.283e-05  1.166e-05   6.245 4.23e-10 ***
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	Residual standard error: 0.2314 on 330992 degrees of freedom
+	  (239057 observations deleted due to missingness)
+	Multiple R-squared:  0.02668,	Adjusted R-squared:  0.02664 
+	F-statistic:   648 on 14 and 330992 DF,  p-value: < 2.2e-16
+
+This is the final linear model and the best model that we can produce with just a simple linear regression. Let's try building a decision tree.
+
+	> dtree1 = rpart(Hotness ~ . , data=D)
+
+After about 15 minutes the command has not yet finished. Let's reduce the number of parameters.
+
+	> dtree1 <- rpart(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature, data=D)
+	> rpart.plot(dtree1)
+	> summary(dtree1)
+	Call:
+	rpart(formula = Hotness ~ Duration + ArtistLatitude + ArtistLongitude + 
+	    KeySignature + Loudness + Tempo + TimeSignature, data = D)
+	  n=331007 (239057 observations deleted due to missingness)
+
+		  CP nsplit rel error   xerror        xstd
+	1 0.02306061      0 1.0000000 1.000004 0.001831945
+	2 0.01000000      1 0.9769394 0.976951 0.001824626
+
+	Variable importance
+	Loudness 
+	     100 
+
+	Node number 1: 331007 observations,    complexity param=0.02306061
+	  mean=0.3564254, MSE=0.05502616 
+	  left son=2 (195953 obs) right son=3 (135054 obs)
+	  Primary splits:
+	      Loudness        < -7.6195   to the left,  improve=0.023060610, (0 missing)
+	      ArtistLatitude  < 40.73422  to the left,  improve=0.003830893, (210051 missing)
+	      ArtistLongitude < -73.95689 to the left,  improve=0.002798338, (210051 missing)
+	      Duration        < 180.9889  to the left,  improve=0.002209511, (0 missing)
+	      TimeSignature   splits as  LLLRLL, improve=0.001912336, (0 missing)
+
+	Node number 2: 195953 observations
+	  mean=0.3268522, MSE=0.0534683 
+
+	Node number 3: 135054 observations
+	  mean=0.3993338, MSE=0.05417641 
+
+This is the best we can do so far. Loudness was the most significant datum. We could finally try with some random forest models. This is however out of scope of this course at the Faculty of Mathematics and Informatics at Sofia University and we won't go into it. We could however try to cluster the datapoints and run models seperately on the different clusters.
+
+We could look at some plots to better understand the data relationships before moving on.
+
+	> plot(D$Duration, D$Hotness)
+	> plot(D$Loudness, D$Hotness)
+	> plot(D$Tempo, D$Hotness)
+	> hist(D$Hotness)
+	> hist(D$Loudness)
+	> hist(D$Tempo)
+
+
+	//TODO: Fix code and add year as a parameter
+
+## Predicting the song year
+
+
+
 ## Setting up for data exploration
 To load the sample data subset do the following in an R console, with the "R" folder of this project being the working directory of R.
 
