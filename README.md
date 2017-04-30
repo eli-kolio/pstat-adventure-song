@@ -411,3 +411,153 @@ To load the sample data subset do the following in an R console, with the "R" fo
 And the we could do some regressions on this. But first, let's do some sample statistics on the data.
 
 	//To be continued
+
+## Logistic regression 
+
+To use the logistic regression in R we need to use the glm flunction. For example we did as it follows:
+
+	>glm2<-glm(YearBucket ~ Duration + KeySignature + Loudness + Tempo + TimeSignature, data=D, family=binomial)
+	>summary(glm2)
+	
+		
+	Call:
+	glm(formula = YearBucket ~ Duration + KeySignature + Loudness + 
+		Tempo + TimeSignature, family = binomial, data = D)
+
+	Deviance Residuals: 
+	   Min      1Q  Median      3Q     Max  
+	-1.478  -1.206   1.037   1.136   1.980  
+
+	Coefficients:
+					 Estimate Std. Error z value Pr(>|z|)    
+	(Intercept)     7.679e-01  1.099e-01   6.985 2.85e-12 ***
+	Duration       -3.556e-04  2.175e-05 -16.347  < 2e-16 ***
+	KeySignature1  -2.967e-02  1.194e-02  -2.484 0.012997 *  
+	KeySignature2   5.068e-02  1.103e-02   4.595 4.32e-06 ***
+	KeySignature3  -4.779e-02  1.714e-02  -2.788 0.005297 ** 
+	KeySignature4   7.960e-02  1.206e-02   6.600 4.11e-11 ***
+	KeySignature5  -4.459e-02  1.246e-02  -3.577 0.000347 ***
+	KeySignature6  -2.853e-03  1.336e-02  -0.213 0.830978    
+	KeySignature7  -3.046e-02  1.067e-02  -2.854 0.004313 ** 
+	KeySignature8  -3.006e-02  1.397e-02  -2.152 0.031382 *  
+	KeySignature9   5.583e-02  1.106e-02   5.046 4.51e-07 ***
+	KeySignature10 -8.518e-02  1.278e-02  -6.663 2.69e-11 ***
+	KeySignature11 -1.225e-02  1.198e-02  -1.022 0.306698    
+	Loudness        3.225e-02  5.406e-04  59.651  < 2e-16 ***
+	Tempo           6.847e-04  7.777e-05   8.804  < 2e-16 ***
+	TimeSignature1 -4.457e-01  1.098e-01  -4.060 4.90e-05 ***
+	TimeSignature3 -4.004e-01  1.097e-01  -3.649 0.000264 ***
+	TimeSignature4 -3.645e-01  1.096e-01  -3.327 0.000879 ***
+	TimeSignature5 -3.929e-01  1.100e-01  -3.572 0.000354 ***
+	TimeSignature7 -3.166e-01  1.108e-01  -2.857 0.004277 ** 
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	(Dispersion parameter for binomial family taken to be 1)
+
+		Null deviance: 789824  on 570063  degrees of freedom
+	Residual deviance: 784666  on 570044  degrees of freedom
+	AIC: 784706
+
+	Number of Fisher Scoring iterations: 4
+	
+Here we notice that our AIC is high, so we exclude some of our variables and run once again a new linear model: 
+
+
+	> glm2<-glm(YearBucket ~ Duration + KeySignature + Tempo + Hotness, data=D, family=binomial)
+	> summary(glm2)
+
+	Call:
+	glm(formula = YearBucket ~ Duration + KeySignature + Tempo + 
+		Hotness, family = binomial, data = D)
+
+	Deviance Residuals: 
+		Min       1Q   Median       3Q      Max  
+	-2.4303  -1.1216   0.6380   0.9074   1.8357  
+
+	Coefficients:
+					 Estimate Std. Error z value Pr(>|z|)    
+	(Intercept)    -8.412e-01  2.003e-02 -41.990  < 2e-16 ***
+	Duration       -2.345e-04  3.221e-05  -7.280 3.34e-13 ***
+	KeySignature1  -7.022e-02  1.730e-02  -4.060 4.91e-05 ***
+	KeySignature2   2.285e-02  1.587e-02   1.440  0.14988    
+	KeySignature3  -9.863e-02  2.507e-02  -3.934 8.36e-05 ***
+	KeySignature4   2.573e-02  1.729e-02   1.488  0.13668    
+	KeySignature5  -8.292e-02  1.802e-02  -4.602 4.18e-06 ***
+	KeySignature6  -4.151e-02  1.925e-02  -2.157  0.03102 *  
+	KeySignature7  -1.831e-02  1.542e-02  -1.187  0.23525    
+	KeySignature8  -8.545e-02  2.030e-02  -4.210 2.56e-05 ***
+	KeySignature9   3.471e-02  1.594e-02   2.177  0.02948 *  
+	KeySignature10 -8.644e-02  1.860e-02  -4.646 3.38e-06 ***
+	KeySignature11 -2.410e-02  1.734e-02  -1.390  0.16461    
+	Tempo           3.453e-04  1.099e-04   3.142  0.00168 ** 
+	Hotness         3.710e+00  1.773e-02 209.232  < 2e-16 ***
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	(Dispersion parameter for binomial family taken to be 1)
+
+		Null deviance: 446901  on 331006  degrees of freedom
+	Residual deviance: 395094  on 330992  degrees of freedom
+	  (239057 observations deleted due to missingness)
+	AIC: 395124
+
+	Number of Fisher Scoring iterations: 4
+	
+We reduced the AIC, but we can do better: 
+
+	> glm4<-glm(YearBucket ~  Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo, data=D, family=binomial)
+	> summary(glm4)
+	
+	AIC: 277524
+	
+Our final decision is this one: 
+
+	> glm1<-glm(YearBucket ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature, data=D, family=binomial)
+	> summary(glm1)
+
+	Call:
+	glm(formula = YearBucket ~ Duration + ArtistLatitude + ArtistLongitude + 
+		KeySignature + Loudness + Tempo + TimeSignature, family = binomial, 
+		data = D)
+
+	Deviance Residuals: 
+		Min       1Q   Median       3Q      Max  
+	-1.6737  -1.1871   0.9238   1.1321   1.9913  
+
+	Coefficients:
+					  Estimate Std. Error z value Pr(>|z|)    
+	(Intercept)      3.924e-01  1.981e-01   1.980  0.04768 *  
+	Duration        -3.870e-04  3.708e-05 -10.438  < 2e-16 ***
+	ArtistLatitude   9.074e-03  2.979e-04  30.458  < 2e-16 ***
+	ArtistLongitude  2.843e-03  8.235e-05  34.521  < 2e-16 ***
+	KeySignature1   -2.406e-02  2.034e-02  -1.183  0.23683    
+	KeySignature2    4.185e-02  1.833e-02   2.282  0.02246 *  
+	KeySignature3   -6.983e-02  2.783e-02  -2.509  0.01212 *  
+	KeySignature4    9.747e-02  2.020e-02   4.824 1.41e-06 ***
+	KeySignature5   -3.389e-02  2.038e-02  -1.663  0.09635 .  
+	KeySignature6    3.799e-02  2.284e-02   1.663  0.09630 .  
+	KeySignature7   -3.129e-02  1.779e-02  -1.759  0.07860 .  
+	KeySignature8   -3.103e-02  2.328e-02  -1.333  0.18255    
+	KeySignature9    7.265e-02  1.846e-02   3.935 8.32e-05 ***
+	KeySignature10  -6.339e-02  2.151e-02  -2.947  0.00321 ** 
+	KeySignature11   1.729e-02  2.055e-02   0.841  0.40036    
+	Loudness         3.308e-02  8.796e-04  37.612  < 2e-16 ***
+	Tempo            1.007e-03  1.314e-04   7.661 1.85e-14 ***
+	TimeSignature1  -2.086e-01  1.974e-01  -1.057  0.29051    
+	TimeSignature3  -1.747e-01  1.973e-01  -0.885  0.37599    
+	TimeSignature4  -1.680e-01  1.971e-01  -0.852  0.39395    
+	TimeSignature5  -1.978e-01  1.977e-01  -1.000  0.31718    
+	TimeSignature7  -9.309e-02  1.990e-01  -0.468  0.63994    
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	(Dispersion parameter for binomial family taken to be 1)
+
+		Null deviance: 281804  on 203555  degrees of freedom
+	Residual deviance: 277470  on 203534  degrees of freedom
+	  (366508 observations deleted due to missingness)
+	AIC: 277514
+
+	Number of Fisher Scoring iterations: 4
+			
