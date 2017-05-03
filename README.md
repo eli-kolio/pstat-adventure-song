@@ -415,7 +415,150 @@ We could look at some plots to better understand the data relationships before m
 
 If we would build a decision tree with year as a parameter we would do it like this:
 
-	some code
+	> dtree2 <- rpart(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + Year, data=D)
+	> rpart.plot(dtree2)
+
+We can see the resulting tree is strongly dependent on the year.
+
+Let's try with year bucket instead
+
+	> dtree2 <- rpart(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + YearBucket, data=D)
+	> rpart.plot(dtree2)
+	
+Now we see that the older songs are not popular at all. And this seems to be consistent across the data set.
+
+### Year analysis, linear regression, factors and ordinal parameters
+
+As you can see, decision trees can take ranges of a value and assign to them specific meaning. This are fixed rules. Regression however, if given the parameter `D$Year`, it would think that it's a number and that, e.g. year 2000 is two times 'more' than the year 1000. This is naturally nonsense and we need to make them into categories. This means that each year or year range should be its own "thing". With no relation to the other years. Not 'bigger' or 'smaller' than them. Thus for regression if we directly use the Year we should get unsatisfactory results.
+
+	> lmy1 <- lm(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + Year, data=D)
+	> summary(lmy1)
+
+
+Call:
+lm(formula = Hotness ~ Duration + ArtistLatitude + ArtistLongitude + 
+KeySignature + Loudness + Tempo + TimeSignature + Year, data = D)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.50166 -0.17082  0.01989  0.15129  0.81240 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      2.128e-01  2.984e-02   7.130 1.01e-12 ***
+Duration         5.562e-06  5.311e-06   1.047 0.295001    
+ArtistLatitude   6.448e-04  3.969e-05  16.248  < 2e-16 ***
+ArtistLongitude  9.807e-05  1.112e-05   8.820  < 2e-16 ***
+KeySignature1    1.313e-02  2.812e-03   4.671 3.00e-06 ***
+KeySignature2    4.030e-03  2.508e-03   1.607 0.108062    
+KeySignature3    7.785e-03  3.922e-03   1.985 0.047153 *  
+KeySignature4    8.886e-03  2.738e-03   3.245 0.001176 ** 
+KeySignature5    1.149e-03  2.823e-03   0.407 0.684087    
+KeySignature6    1.230e-02  3.108e-03   3.956 7.62e-05 ***
+KeySignature7   -1.379e-03  2.445e-03  -0.564 0.572786    
+KeySignature8    1.230e-02  3.227e-03   3.813 0.000137 ***
+KeySignature9   -2.539e-04  2.527e-03  -0.100 0.919956    
+KeySignature10  -1.790e-03  2.988e-03  -0.599 0.549149    
+KeySignature11   9.542e-03  2.813e-03   3.392 0.000695 ***
+Loudness         6.591e-03  1.249e-04  52.794  < 2e-16 ***
+Tempo            1.117e-04  1.802e-05   6.198 5.75e-10 ***
+TimeSignature1   6.209e-02  2.969e-02   2.092 0.036481 *  
+TimeSignature3   6.750e-02  2.967e-02   2.275 0.022923 *  
+TimeSignature4   6.626e-02  2.964e-02   2.236 0.025367 *  
+TimeSignature5   6.698e-02  2.972e-02   2.253 0.024236 *  
+TimeSignature7   7.083e-02  2.988e-02   2.371 0.017764 *  
+Year             8.683e-05  6.338e-07 136.996  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.214 on 120933 degrees of freedom
+  (449108 observations deleted due to missingness)
+Multiple R-squared:  0.1698,    Adjusted R-squared:  0.1697 
+F-statistic:  1125 on 22 and 120933 DF,  p-value: < 2.2e-16
+
+For comparison we had an R-squared of 0.04 in the previous model without year.
+
+If we use YearBucket instead we get:
+
+	> lmy1 <- lm(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + YearBucket, data=D)
+	> summary(lmy1)
+
+Call:
+lm(formula = Hotness ~ Duration + ArtistLatitude + ArtistLongitude + 
+    KeySignature + Loudness + Tempo + TimeSignature + YearBucket, 
+    data = D)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.56633 -0.17031  0.01958  0.15027  0.80599 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.744e-01  2.973e-02  12.591  < 2e-16 ***
+Duration         6.071e-06  5.296e-06   1.146 0.251656    
+ArtistLatitude   6.036e-04  3.956e-05  15.257  < 2e-16 ***
+ArtistLongitude  8.773e-05  1.110e-05   7.903 2.75e-15 ***
+KeySignature1    1.246e-02  2.801e-03   4.448 8.69e-06 ***
+KeySignature2    4.340e-03  2.498e-03   1.738 0.082278 .  
+KeySignature3    7.496e-03  3.906e-03   1.919 0.055009 .  
+KeySignature4    9.473e-03  2.728e-03   3.473 0.000515 ***
+KeySignature5    1.038e-03  2.812e-03   0.369 0.712069    
+KeySignature6    1.251e-02  3.096e-03   4.042 5.30e-05 ***
+KeySignature7   -7.162e-04  2.435e-03  -0.294 0.768701    
+KeySignature8    1.177e-02  3.215e-03   3.660 0.000252 ***
+KeySignature9    6.772e-04  2.517e-03   0.269 0.787882    
+KeySignature10  -2.000e-03  2.976e-03  -0.672 0.501588    
+KeySignature11   9.728e-03  2.802e-03   3.471 0.000518 ***
+Loudness         6.015e-03  1.280e-04  46.976  < 2e-16 ***
+Tempo            1.248e-04  1.796e-05   6.950 3.67e-12 ***
+TimeSignature1   6.072e-02  2.957e-02   2.054 0.040009 *  
+TimeSignature3   6.414e-02  2.955e-02   2.171 0.029957 *  
+TimeSignature4   6.376e-02  2.952e-02   2.160 0.030750 *  
+TimeSignature5   6.350e-02  2.960e-02   2.145 0.031956 *  
+TimeSignature7   6.703e-02  2.976e-02   2.252 0.024297 *  
+YearBucket.L     9.878e-02  8.921e-03  11.073  < 2e-16 ***
+YearBucket.Q     5.753e-02  8.909e-03   6.458 1.07e-10 ***
+YearBucket.C     1.281e-01  7.961e-03  16.092  < 2e-16 ***
+YearBucket^4    -3.461e-02  6.439e-03  -5.374 7.71e-08 ***
+YearBucket^5     4.750e-02  5.593e-03   8.493  < 2e-16 ***
+YearBucket^6    -2.783e-02  6.359e-03  -4.376 1.21e-05 ***
+YearBucket^7     8.188e-02  7.714e-03  10.614  < 2e-16 ***
+YearBucket^8    -6.492e-02  8.935e-03  -7.266 3.73e-13 ***
+YearBucket^9     5.151e-02  9.563e-03   5.386 7.20e-08 ***
+YearBucket^10   -4.552e-02  9.899e-03  -4.599 4.26e-06 ***
+YearBucket^11    4.441e-02  9.875e-03   4.497 6.90e-06 ***
+YearBucket^12   -3.921e-02  9.547e-03  -4.107 4.01e-05 ***
+YearBucket^13    4.496e-02  9.018e-03   4.985 6.20e-07 ***
+YearBucket^14   -9.426e-03  8.324e-03  -1.132 0.257464    
+YearBucket^15    1.081e-02  7.740e-03   1.396 0.162636    
+YearBucket^16   -7.116e-03  7.218e-03  -0.986 0.324215    
+YearBucket^17    1.312e-02  6.773e-03   1.938 0.052660 .  
+YearBucket^18   -1.942e-02  6.270e-03  -3.097 0.001955 ** 
+YearBucket^19    8.167e-04  5.840e-03   0.140 0.888790    
+YearBucket^20   -3.107e-04  5.593e-03  -0.056 0.955701    
+YearBucket^21   -1.129e-02  5.493e-03  -2.056 0.039819 *  
+YearBucket^22   -1.708e-03  5.569e-03  -0.307 0.759085    
+YearBucket^23   -5.662e-04  5.577e-03  -0.102 0.919130    
+YearBucket^24    8.094e-03  5.673e-03   1.427 0.153657    
+YearBucket^25    1.012e-03  5.640e-03   0.179 0.857623    
+YearBucket^26   -5.854e-03  5.705e-03  -1.026 0.304837    
+YearBucket^27   -9.880e-04  5.434e-03  -0.182 0.855717    
+YearBucket^28    2.836e-03  4.848e-03   0.585 0.558661    
+YearBucket^29    5.292e-04  4.747e-03   0.111 0.911238    
+YearBucket^30    1.171e-02  5.815e-03   2.013 0.044071 *  
+YearBucket^31    3.093e-04  6.416e-03   0.048 0.961546    
+YearBucket^32   -2.219e-02  5.449e-03  -4.073 4.65e-05 ***
+YearBucket^33   -9.848e-04  5.514e-03  -0.179 0.858251    
+YearBucket^34   -8.047e-03  4.768e-03  -1.688 0.091464 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2131 on 120900 degrees of freedom
+  (449108 observations deleted due to missingness)
+Multiple R-squared:  0.177,     Adjusted R-squared:  0.1767 
+F-statistic: 472.9 on 55 and 120900 DF,  p-value: < 2.2e-16
+
+Clearly this is better in terms of R-squared than the previous one, however overfitting needs to be investigated as this method is prone to it.
 
 ## Predicting the song year
 
