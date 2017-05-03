@@ -1,4 +1,8 @@
+![Uni logo](https://www.fmi.uni-sofia.bg/en/logo.jpg)
+
 # Million Songs Dataset statistical analysis
+![Million song dataset logo](https://labrosa.ee.columbia.edu/millionsong/sites/default/files/millionsong2-128.jpg)
+
 This is the manifestation of a project in "Applied Statistics" for 3rd year students at the [Faculty of Mathematics and Informatics](http://fmi.uni-sofia.bg/) of Sofia University.
 Our main goal here will be to process some subset of the million songs dataset and extract meaningful correlations between the parameters.
 
@@ -6,8 +10,9 @@ Our main goal here will be to process some subset of the million songs dataset a
 You can find documentation for the project as LaTeX scripts and PDFs in the "Project Documentation" subfolder.
 
 ## Preparing the dataset
+![AWS logo](https://www.xenappblog.com/wp-content/uploads/2015/01/AmazonWebservices_Logo.svg_.png)
 
-The [million songs dataset](https://labrosa.ee.columbia.edu/millionsong/) is in the exotic HDF5 format. It contains a lot of "local" file information (song segments, tempos and audio characteristics for each segment, etc). They could thus be used for audio recognition and song segment recognition. Here, however, we will focus on more global characteristics of the songs. We will be investigating *Album*, *Artist* and *Song* details like release year, tempo, popularity (refered to as "hotness" in the dataset), loudness, etc. to produce a CSV that is edible by R, we needed to create a script, which can be found [here](https://github.com/nikox94/Million-Song-Dataset-HDF5-to-CSV). This extracts the attributes we need from the HDF5 file and converts them to CSV. We have a sample dataset of a 1% subset of the million songs, i.e. we have 10,000 songs in the sample dataset. It is about 2MB and can easily be worked with to produce prototypes, which can then be run on the complete dataset if tractable. To get the whole 1,000,000 songs as a CSV, an Amazon machine was launched, with the dataset (280GB) attached as an Amazon EBS Volume (Amazon supports Million Songs as a public dataset and has an available copy for mounting). This was all run in the cloud, with our script currently running through the whole dataset, extracting the data we need. The resulting CSV should be 200MB and the total running time of the extraction should be 30 hours. The used EBS volume is an SSD, but we seem to be reaching some other bottleneck (CPU usage, RAM, SSD iops all look fine). My suspicion is that the bottleneck is that the Amazon Volume is actually created on the fly as data from the Amazon Snapshot is being read.
+The [million songs dataset](https://labrosa.ee.columbia.edu/millionsong/) is in the exotic HDF5 format. It contains a lot of "local" file information (song segments, tempos and audio characteristics for each segment, etc). They could thus be used for audio recognition and song segment recognition. Here, however, we will focus on more global characteristics of the songs. We will be investigating *Album*, *Artist* and *Song* details like release year, tempo, popularity (refered to as "hotness" in the dataset), loudness, etc. to produce a CSV that is edible by R, we needed to create a script, which can be found [here](https://github.com/nikox94/Million-Song-Dataset-HDF5-to-CSV). This extracts the attributes we need from the HDF5 file and converts them to CSV. We have a sample dataset of a 1% subset of the million songs, i.e. we have 10,000 songs in the sample dataset. It is about 2MB and can easily be worked with to produce prototypes, which can then be run on the complete dataset if tractable. To get the whole 1,000,000 songs as a CSV, an Amazon machine was launched, with the **dataset (280GB)** attached as an **Amazon EBS Volume** (Amazon supports Million Songs as a public dataset and has an available copy for mounting). This was all run in the cloud, with our script currently running through the whole dataset, extracting the data we need. The resulting CSV should be **200MB** and the total running time of the extraction should be **30 hours**. The used EBS volume is an SSD, but we seem to be reaching some other bottleneck (CPU usage, RAM, SSD iops all look fine). My suspicion is that the bottleneck is that the Amazon Volume is actually created on the fly as data from the Amazon Snapshot is being read.
 
 ## Installation
 You need to have some form of R installed in order to work with the dataset. We will provide sample scripts for manipulating the data and plotting.
@@ -17,6 +22,8 @@ You need to have some form of R installed in order to work with the dataset. We 
 	# Check version
 	R --version
 	# We are using 3.2.3 for this project
+
+![R logo](https://www.r-project.org/Rlogo.png)
 
 ## Cleaning the data
 Before we start work on the data in R, we used LibreOffice Calc, to reorder some columns and remove some other columns.
@@ -382,6 +389,10 @@ After about 15 minutes the command has not yet finished. Let's reduce the number
 
 	Node number 3: 135054 observations
 	  mean=0.3993338, MSE=0.05417641 
+	  
+Here is the tree plot:
+
+![hotness_dtree1](graphics/hotness_dtree1.png)
 
 This is the best we can do so far. Loudness was the most significant datum. We could finally try with some random forest models. This is however out of scope of this course at the Faculty of Mathematics and Informatics at Sofia University and we won't go into it. We could however try to cluster the datapoints and run models seperately on the different clusters.
 
@@ -394,8 +405,17 @@ We could look at some plots to better understand the data relationships before m
 	> hist(D$Loudness)
 	> hist(D$Tempo)
 
+![hotness_duration](graphics/hotness_duration.png)
+![hotness_loudness](graphics/hotness_loudness.png)
+![hotness_tempo](graphics/hotness_tempo.png)
+![hotness_frequency](graphics/hotness_frequency.png)
 
-	//TODO: Fix code and add year as a parameter
+
+### Decision tree with year as a parameter
+
+If we would build a decision tree with year as a parameter we would do it like this:
+
+	some code
 
 ## Predicting the song year
 
