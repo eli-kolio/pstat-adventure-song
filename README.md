@@ -164,6 +164,11 @@ For the year factor, we might need some more information. We want to make the bu
 			  0              293564 
 
 It seems that the breaks are not very even. We will need to specify the breaks by hand.
+Let's investigate the data distribution:
+
+	> hist(D$Year)
+	
+![year histogram](graphics/year_frequency.png)
 
 	> summary(as.factor(D$Year))
 	     0   1922   1924   1925   1926   1927   1928   1929   1930   1931   1932 
@@ -409,6 +414,7 @@ We could look at some plots to better understand the data relationships before m
 ![hotness_loudness](graphics/hotness_loudness.png)
 ![hotness_tempo](graphics/hotness_tempo.png)
 ![hotness_frequency](graphics/hotness_frequency.png)
+![duration_frequency](graphics/duration_frequency.png)
 
 
 ### Decision tree with year as a parameter
@@ -417,6 +423,8 @@ If we would build a decision tree with year as a parameter we would do it like t
 
 	> dtree2 <- rpart(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + Year, data=D)
 	> rpart.plot(dtree2)
+	
+![dtree2 plot](graphics/hotness_dtree2.png)
 
 We can see the resulting tree is strongly dependent on the year.
 
@@ -424,6 +432,8 @@ Let's try with year bucket instead
 
 	> dtree2 <- rpart(Hotness ~ Duration + ArtistLatitude + ArtistLongitude + KeySignature + Loudness + Tempo + TimeSignature + YearBucket, data=D)
 	> rpart.plot(dtree2)
+	
+![dtree3 plot](graphics/hotness_dtree3.png)
 	
 Now we see that the older songs are not popular at all. And this seems to be consistent across the data set.
 
